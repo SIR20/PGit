@@ -1,4 +1,4 @@
-﻿uses System, System.IO, System.Security.Principal, System.Diagnostics;
+﻿uses System, System.IO, Microsoft.Win32;
 {$apptype windows}
 
 
@@ -8,13 +8,18 @@
 //ToDo: Сделать графический показ изменений(другое приложение)
 //ToDO: Исправить ошибку доступа к файлу PGit.GitIni
 //ToDo: Не работает если больше одного файла - исправил
-//ToDo: Исправить счетчик версий(после 1.8 иди 1.999) - Сделал просто счетчик целых чисел
-//ToDo: Сделать окно невидимым.
+//ToDo: Исправить счетчик версий(после 1.8 или 1.999) - Сделал просто счетчик целых чисел
+//ToDo: Сделать окно невидимым. - сделал 
+//ToDo: Сделать графический обзор изминений(другое приложение)
+//ToDo: Сделать аргумент с приявзякой к файлу(path:*Путь к файлу),и в IDE тоже
+//ToDo: Сделать "help" если запуск без аргументов.
+//ToDo: Изменить реестр так,что бы запсук был из папки,где установлен Паскаль
 
 
 const
   fnconfig = 'PGit.GitIni';
   GDirectory = 'PGitVersion';
+  GExeconfig = 'GitExeConfig.GitConfig';
 
 function string.GetString(oi, ni: integer): string;
 begin
@@ -88,6 +93,25 @@ begin
 end;
 
 begin
+  if not &File.Exists(GExeconfig)
+  then begin
+    try
+      var GitNewkey := Registry.ClassesRoot;
+      var GitKey := GitNewkey.CreateSubKey('PABCNetGit', true);
+      var CrShell := GitKey.CreateSubKey('Shell');
+      CrShell.SetValue('', 'ToGit');
+      var CrToGit := CrShell.CreateSubKey('ToGit', true);
+      CrToGit.SetValue('','Сохранить в Git');
+      var CrComm := CrToGit.CreateSubKey('Command');
+      CrComm.SetValue('', '"E:\PascalABC.NET\PABCNetGit.exe" "%1"');
+      GitNewkey.Close;
+    except
+      on e: Exception do begin
+        TextOut(ConsoleColor.Red, e.ToString);
+        sleep(15000);
+      end;
+    end;
+  end;
   if ParamCount = 0
   then begin
     TextOut(ConsoleColor.Red, 'Параметры не переданы!');
