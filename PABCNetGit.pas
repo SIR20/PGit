@@ -93,25 +93,27 @@ begin
 end;
 
 begin
+  {
   if not &File.Exists(GExeconfig)
   then begin
     try
       var GitNewkey := Registry.ClassesRoot;
-      var GitKey := GitNewkey.CreateSubKey('PABCNetGit', true);
-      var CrShell := GitKey.CreateSubKey('Shell');
-      CrShell.SetValue('', 'ToGit');
-      var CrToGit := CrShell.CreateSubKey('ToGit', true);
-      CrToGit.SetValue('','Сохранить в Git');
+      var GitKey := GitNewkey.CreateSubKey('*', true);
+      var CrShell := GitKey.CreateSubKey('shell');
+      CrShell.SetValue('','ToGit');
+      var CrToGit := CrShell.CreateSubKey('togit', true);
+      CrToGit.SetValue('togit', 'Сохранить в Git');
       var CrComm := CrToGit.CreateSubKey('Command');
-      CrComm.SetValue('', '"E:\PascalABC.NET\PABCNetGit.exe" "%1"');
+      CrComm.SetValue('togit', $'"{System.IO.Path.GetDirectoryName(fname)}{\PABCNetGit.exe" "%1"');
       GitNewkey.Close;
+      
     except
       on e: Exception do begin
         TextOut(ConsoleColor.Red, e.ToString);
         sleep(15000);
       end;
     end;
-  end;
+  end;}
   if ParamCount = 0
   then begin
     TextOut(ConsoleColor.Red, 'Параметры не переданы!');
